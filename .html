@@ -1,0 +1,1141 @@
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Brasileirão & Libertadores Ultra Manager</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pitch: { 800: '#064e3b', 700: '#047857', 600: '#059669', 400: '#34d399' },
+                        darkbg: '#070a0f',
+                        cardbg: '#111827',
+                        cardborder: '#1f2937',
+                        gold: '#f59e0b',
+                        fifa: '#00ff87'
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        teko: ['Teko', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: #070a0f; }
+        ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 4px; }
+        .glass-panel { background: rgba(17, 24, 39, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.07); }
+        .pitch-bg { background: radial-gradient(circle, #0a5c36 0%, #032e18 100%); }
+        .stat-badge { font-family: 'Teko', sans-serif; letter-spacing: 0.5px; }
+        .no-select { user-select: none; -webkit-user-select: none; }
+    </style>
+</head>
+<body class="bg-darkbg text-slate-100 font-sans antialiased min-h-screen flex flex-col no-select overflow-x-hidden pb-20 md:pb-0">
+
+    <!-- TOP HEADER -->
+    <header class="bg-slate-900/95 border-b border-slate-800 sticky top-0 z-40 px-4 py-2.5 flex items-center justify-between shadow-lg backdrop-blur-md">
+        <div class="flex items-center gap-3">
+            <div id="user-club-badge" class="w-9 h-9 rounded-full bg-slate-800 border-2 border-emerald-500 flex items-center justify-center text-xs font-bold text-emerald-400 shadow-md">
+                FLA
+            </div>
+            <div>
+                <h1 id="user-club-name" class="font-bold text-sm leading-tight text-white flex items-center gap-2">Carregando...</h1>
+                <div class="flex items-center gap-2 text-[10px]">
+                    <span class="text-emerald-400 font-semibold uppercase">Popularidade: <span id="header-popularity">85</span>%</span>
+                </div>
+            </div>
+        </div>
+        <div class="flex items-center gap-3 text-xs">
+            <div class="hidden sm:flex flex-col items-end">
+                <span class="text-[10px] text-slate-400">Caixa / Orçamento</span>
+                <span id="header-budget" class="font-semibold text-emerald-400">R$ 0M</span>
+            </div>
+            <div class="bg-slate-800/80 px-3 py-1 rounded-lg border border-slate-700/60 text-right">
+                <div id="header-date" class="font-bold text-slate-200 text-xs">01 Abr, 2026</div>
+                <div id="header-season" class="text-[9px] text-slate-400">Brasileirão 2026</div>
+            </div>
+            <button onclick="app.openModal('settings')" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 flex items-center justify-center transition">
+                <i class="fa-solid fa-gear text-xs"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN VIEW CONTAINER -->
+    <main id="main-container" class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 flex flex-col gap-4">
+        <!-- Dynamic views -->
+    </main>
+
+    <!-- NAVIGATION BAR -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-slate-900/95 border-t border-slate-800 z-40 px-2 py-1.5 backdrop-blur-lg flex justify-around items-center text-slate-400 md:relative md:border-t-0 md:bg-transparent md:mb-4">
+        <button onclick="app.switchTab('dashboard')" id="nav-dashboard" class="nav-btn flex flex-col items-center py-1 px-3 rounded-lg text-emerald-400 font-medium text-[11px] transition">
+            <i class="fa-solid fa-gauge-high text-lg mb-0.5"></i><span>Painel</span>
+        </button>
+        <button onclick="app.switchTab('squad')" id="nav-squad" class="nav-btn flex flex-col items-center py-1 px-3 rounded-lg hover:text-emerald-400 font-medium text-[11px] transition">
+            <i class="fa-solid fa-users text-lg mb-0.5"></i><span>Elenco</span>
+        </button>
+        <button onclick="app.switchTab('match')" id="nav-match" class="nav-btn flex flex-col items-center py-1 px-3 rounded-lg hover:text-emerald-400 font-medium text-[11px] transition">
+            <i class="fa-solid fa-futbol text-lg mb-0.5"></i><span>Jogos</span>
+        </button>
+        <button onclick="app.switchTab('competitions')" id="nav-competitions" class="nav-btn flex flex-col items-center py-1 px-3 rounded-lg hover:text-emerald-400 font-medium text-[11px] transition">
+            <i class="fa-solid fa-trophy text-lg mb-0.5"></i><span>Tabelas</span>
+        </button>
+        <button onclick="app.switchTab('transfers')" id="nav-transfers" class="nav-btn flex flex-col items-center py-1 px-3 rounded-lg hover:text-emerald-400 font-medium text-[11px] transition">
+            <i class="fa-solid fa-handshake text-lg mb-0.5"></i><span>Mercado</span>
+        </button>
+        <button onclick="app.switchTab('trophies')" id="nav-trophies" class="nav-btn flex flex-col items-center py-1 px-3 rounded-lg hover:text-emerald-400 font-medium text-[11px] transition">
+            <i class="fa-solid fa-medal text-lg mb-0.5"></i><span>Troféus</span>
+        </button>
+    </nav>
+
+    <!-- MODAL OVERLAY -->
+    <div id="modal-overlay" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+        <div id="modal-content" class="glass-panel w-full max-w-2xl rounded-2xl p-5 border border-slate-700 shadow-2xl max-h-[90vh] overflow-y-auto"></div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast-container" class="fixed top-14 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- GAME ENGINE SCRIPT -->
+    <script>
+        /**
+         * BRASILEIRÃO & LIBERTADORES ULTRA MANAGER
+         * Full 20 Clubs Brasileirão (38 rounds), Match Simulator, Starting 11 & Substitutes, Transfers & Finance.
+         */
+
+        const BRASILEIRAO_TEAMS = [
+            { id: 'fla', name: 'Flamengo', short: 'FLA', color: '#dc2626', rep: 88, budget: 65000000, realTrophies: { br: 8, lib: 3, copa: 5 }, stadium: 'Maracanã', players: [
+                { id: 'f1', name: 'A. Rossi', pos: 'GK', ovr: 79, starter: true, val: 14000000, stats: {pac:40,sho:20,pas:65,def:20,phy:78} },
+                { id: 'f2', name: 'L. Ortiz', pos: 'CB', ovr: 79, starter: true, val: 14000000, stats: {pac:69,sho:45,pas:72,def:81,phy:79} },
+                { id: 'f3', name: 'Fabrício Bruno', pos: 'CB', ovr: 78, starter: true, val: 12000000, stats: {pac:78,sho:35,pas:62,def:80,phy:82} },
+                { id: 'f4', name: 'Ayrton Lucas', pos: 'LB', ovr: 78, starter: true, val: 13000000, stats: {pac:88,sho:68,pas:73,def:75,phy:74} },
+                { id: 'f5', name: 'Varela', pos: 'RB', ovr: 77, starter: true, val: 10000000, stats: {pac:84,sho:55,pas:70,def:76,phy:77} },
+                { id: 'f6', name: 'E. Pulgar', pos: 'CDM', ovr: 78, starter: true, val: 12000000, stats: {pac:68,sho:69,pas:77,def:79,phy:80} },
+                { id: 'f7', name: 'Gerson', pos: 'CM', ovr: 80, starter: true, val: 20000000, stats: {pac:74,sho:74,pas:80,def:72,phy:81} },
+                { id: 'f8', name: 'De Arrascaeta', pos: 'CAM', ovr: 83, starter: true, val: 32000000, stats: {pac:75,sho:80,pas:86,def:42,phy:68} },
+                { id: 'f9', name: 'Everton Cebolinha', pos: 'LW', ovr: 79, starter: true, val: 16000000, stats: {pac:88,sho:76,pas:74,def:45,phy:69} },
+                { id: 'f10', name: 'G. Barbosa', pos: 'ST', ovr: 81, starter: true, val: 25000000, stats: {pac:80,sho:83,pas:74,def:35,phy:76} },
+                { id: 'f11', name: 'Pedro', pos: 'ST', ovr: 82, starter: true, val: 28000000, stats: {pac:72,sho:84,pas:72,def:30,phy:82} },
+                { id: 'f12', name: 'Matheus Cunha', pos: 'GK', ovr: 75, starter: false, val: 6000000, stats: {pac:38,sho:20,pas:62,def:20,phy:74} },
+                { id: 'f13', name: 'David Luiz', pos: 'CB', ovr: 76, starter: false, val: 4000000, stats: {pac:60,sho:55,pas:76,def:77,phy:72} },
+                { id: 'f14', name: 'Allan', pos: 'CM', ovr: 77, starter: false, val: 9000000, stats: {pac:72,sho:65,pas:78,def:74,phy:75} },
+                { id: 'f15', name: 'Bruno Henrique', pos: 'LW', ovr: 78, starter: false, val: 10000000, stats: {pac:91,sho:77,pas:70,def:40,phy:76} }
+            ]},
+            { id: 'pal', name: 'Palmeiras', short: 'PAL', color: '#16a34a', rep: 88, budget: 60000000, realTrophies: { br: 12, lib: 3, copa: 4 }, stadium: 'Allianz Parque', players: [
+                { id: 'p1', name: 'Weverton', pos: 'GK', ovr: 80, starter: true, val: 5000000, stats: {pac:42,sho:20,pas:68,def:20,phy:77} },
+                { id: 'p2', name: 'Gustavo Gómez', pos: 'CB', ovr: 81, starter: true, val: 18000000, stats: {pac:66,sho:58,pas:62,def:84,phy:85} },
+                { id: 'p3', name: 'Murilo', pos: 'CB', ovr: 79, starter: true, val: 14000000, stats: {pac:72,sho:45,pas:65,def:81,phy:78} },
+                { id: 'p4', name: 'Piquerez', pos: 'LB', ovr: 80, starter: true, val: 16000000, stats: {pac:82,sho:70,pas:76,def:78,phy:77} },
+                { id: 'p5', name: 'Mayke', pos: 'RB', ovr: 78, starter: true, val: 9000000, stats: {pac:83,sho:65,pas:73,def:76,phy:74} },
+                { id: 'p6', name: 'Aníbal Moreno', pos: 'CDM', ovr: 80, starter: true, val: 17000000, stats: {pac:73,sho:68,pas:76,def:81,phy:83} },
+                { id: 'p7', name: 'Zé Rafael', pos: 'CM', ovr: 79, starter: true, val: 12000000, stats: {pac:72,sho:70,pas:78,def:77,phy:80} },
+                { id: 'p8', name: 'Raphael Veiga', pos: 'CAM', ovr: 82, starter: true, val: 26000000, stats: {pac:74,sho:83,pas:84,def:55,phy:73} },
+                { id: 'p9', name: 'Estêvão', pos: 'RW', ovr: 78, starter: true, val: 28000000, stats: {pac:88,sho:75,pas:76,def:32,phy:60} },
+                { id: 'p10', name: 'Dudu', pos: 'LW', ovr: 79, starter: true, val: 10000000, stats: {pac:85,sho:76,pas:78,def:44,phy:69} },
+                { id: 'p11', name: 'Flaco López', pos: 'ST', ovr: 77, starter: true, val: 12000000, stats: {pac:73,sho:78,pas:68,def:35,phy:78} },
+                { id: 'p12', name: 'Marcelo Lomba', pos: 'GK', ovr: 73, starter: false, val: 1500000, stats: {pac:38,sho:20,pas:64,def:20,phy:74} },
+                { id: 'p13', name: 'Vitor Reis', pos: 'CB', ovr: 76, starter: false, val: 12000000, stats: {pac:75,sho:40,pas:68,def:77,phy:75} },
+                { id: 'p14', name: 'Richard Ríos', pos: 'CM', ovr: 78, starter: false, val: 14000000, stats: {pac:79,sho:72,pas:76,def:74,phy:78} }
+            ]},
+            { id: 'cam', name: 'Atlético-MG', short: 'CAM', color: '#1e293b', rep: 84, budget: 40000000, realTrophies: { br: 3, lib: 1, copa: 2 }, stadium: 'Arena MRV', players: [
+                { id: 'a1', name: 'Everson', pos: 'GK', ovr: 78, starter: true, val: 6000000, stats: {pac:40,sho:20,pas:75,def:20,phy:76} },
+                { id: 'a2', name: 'M. Lemos', pos: 'CB', ovr: 77, starter: true, val: 7000000, stats: {pac:68,sho:55,pas:70,def:78,phy:76} },
+                { id: 'a3', name: 'Jemerson', pos: 'CB', ovr: 77, starter: true, val: 6500000, stats: {pac:70,sho:40,pas:66,def:79,phy:78} },
+                { id: 'a4', name: 'G. Arana', pos: 'LB', ovr: 79, starter: true, val: 15000000, stats: {pac:85,sho:68,pas:76,def:76,phy:75} },
+                { id: 'a5', name: 'Saravia', pos: 'RB', ovr: 76, starter: true, val: 5000000, stats: {pac:78,sho:50,pas:70,def:75,phy:74} },
+                { id: 'a6', name: 'Otávio', pos: 'CDM', ovr: 77, starter: true, val: 8000000, stats: {pac:69,sho:55,pas:73,def:80,phy:79} },
+                { id: 'a7', name: 'Alan Franco', pos: 'CM', ovr: 77, starter: true, val: 8500000, stats: {pac:77,sho:66,pas:74,def:74,phy:77} },
+                { id: 'a8', name: 'G. Scarpa', pos: 'CAM', ovr: 79, starter: true, val: 14000000, stats: {pac:74,sho:77,pas:82,def:55,phy:68} },
+                { id: 'a9', name: 'Paulinho', pos: 'LW', ovr: 80, starter: true, val: 22000000, stats: {pac:86,sho:81,pas:73,def:42,phy:69} },
+                { id: 'a10', name: 'Hulk', pos: 'ST', ovr: 82, starter: true, val: 8000000, stats: {pac:78,sho:86,pas:78,def:45,phy:88} },
+                { id: 'a11', name: 'E. Vargas', pos: 'ST', ovr: 76, starter: true, val: 4000000, stats: {pac:76,sho:77,pas:69,def:35,phy:70} },
+                { id: 'a12', name: 'M. Mendes', pos: 'GK', ovr: 72, starter: false, val: 1500000, stats: {pac:38,sho:20,pas:60,def:20,phy:72} },
+                { id: 'a13', name: 'Battaglia', pos: 'CB', ovr: 76, starter: false, val: 4000000, stats: {pac:62,sho:50,pas:68,def:78,phy:80} }
+            ]},
+            { id: 'spo', name: 'São Paulo', short: 'SAO', color: '#dc2626', rep: 84, budget: 35000000, realTrophies: { br: 6, lib: 3, copa: 1 }, stadium: 'MorumBis', players: [
+                { id: 's1', name: 'Rafael', pos: 'GK', ovr: 78, starter: true, val: 4000000, stats: {pac:40,sho:20,pas:66,def:20,phy:77} },
+                { id: 's2', name: 'Arboleda', pos: 'CB', ovr: 79, starter: true, val: 9000000, stats: {pac:69,sho:50,pas:62,def:82,phy:83} },
+                { id: 's3', name: 'Alan Franco', pos: 'CB', ovr: 76, starter: true, val: 5000000, stats: {pac:65,sho:40,pas:67,def:77,phy:76} },
+                { id: 's4', name: 'Welington', pos: 'LB', ovr: 76, starter: true, val: 7000000, stats: {pac:84,sho:55,pas:70,def:73,phy:72} },
+                { id: 's5', name: 'Igor Vinícius', pos: 'RB', ovr: 76, starter: true, val: 6000000, stats: {pac:82,sho:60,pas:71,def:74,phy:73} },
+                { id: 's6', name: 'Pablo Maia', pos: 'CDM', ovr: 79, starter: true, val: 15000000, stats: {pac:71,sho:68,pas:75,def:81,phy:79} },
+                { id: 's7', name: 'Luiz Gustavo', pos: 'CDM', ovr: 77, starter: true, val: 2000000, stats: {pac:62,sho:70,pas:76,def:78,phy:77} },
+                { id: 's8', name: 'Luciano', pos: 'CAM', ovr: 79, starter: true, val: 10000000, stats: {pac:74,sho:80,pas:75,def:42,phy:75} },
+                { id: 's9', name: 'Lucas Moura', pos: 'RW', ovr: 80, starter: true, val: 11000000, stats: {pac:85,sho:78,pas:76,def:48,phy:70} },
+                { id: 's10', name: 'Ferreirinha', pos: 'LW', ovr: 77, starter: true, val: 9000000, stats: {pac:88,sho:73,pas:70,def:38,phy:68} },
+                { id: 's11', name: 'J. Calleri', pos: 'ST', ovr: 79, starter: true, val: 12000000, stats: {pac:72,sho:80,pas:68,def:45,phy:83} },
+                { id: 's12', name: 'Jandrei', pos: 'GK', ovr: 73, starter: false, val: 1500000, stats: {pac:38,sho:20,pas:62,def:20,phy:74} },
+                { id: 's13', name: 'R. Nestor', pos: 'CM', ovr: 77, starter: false, val: 10000000, stats: {pac:74,sho:72,pas:78,def:65,phy:70} }
+            ]},
+            { id: 'bot', name: 'Botafogo', short: 'BOT', color: '#0f172a', rep: 84, budget: 45000000, realTrophies: { br: 2, lib: 1, copa: 0 }, stadium: 'Nilton Santos', players: [
+                { id: 'b1', name: 'John', pos: 'GK', ovr: 78, starter: true, val: 7000000, stats: {pac:42,sho:20,pas:66,def:20,phy:76} },
+                { id: 'b2', name: 'Bastos', pos: 'CB', ovr: 77, starter: true, val: 5000000, stats: {pac:70,sho:40,pas:65,def:79,phy:78} },
+                { id: 'b3', name: 'A. Barboza', pos: 'CB', ovr: 78, starter: true, val: 8000000, stats: {pac:68,sho:45,pas:70,def:80,phy:82} },
+                { id: 'b4', name: 'Cuiabano', pos: 'LB', ovr: 76, starter: true, val: 7000000, stats: {pac:86,sho:65,pas:69,def:72,phy:74} },
+                { id: 'b5', name: 'M. Ponte', pos: 'RB', ovr: 75, starter: true, val: 5000000, stats: {pac:85,sho:55,pas:66,def:72,phy:73} },
+                { id: 'b6', name: 'Gregore', pos: 'CDM', ovr: 78, starter: true, val: 9000000, stats: {pac:72,sho:55,pas:73,def:82,phy:85} },
+                { id: 'b7', name: 'Marlon Freitas', pos: 'CM', ovr: 78, starter: true, val: 10000000, stats: {pac:73,sho:68,pas:78,def:76,phy:75} },
+                { id: 'b8', name: 'T. Almada', pos: 'CAM', ovr: 82, starter: true, val: 27000000, stats: {pac:84,sho:80,pas:82,def:50,phy:65} },
+                { id: 'b9', name: 'Luiz Henrique', pos: 'RW', ovr: 81, starter: true, val: 24000000, stats: {pac:90,sho:77,pas:76,def:40,phy:70} },
+                { id: 'b10', name: 'Savarino', pos: 'LW', ovr: 79, starter: true, val: 12000000, stats: {pac:87,sho:76,pas:77,def:42,phy:68} },
+                { id: 'b11', name: 'Igor Jesus', pos: 'ST', ovr: 78, starter: true, val: 14000000, stats: {pac:82,sho:78,pas:68,def:38,phy:79} },
+                { id: 'b12', name: 'Gatito F.', pos: 'GK', ovr: 75, starter: false, val: 2000000, stats: {pac:38,sho:20,pas:64,def:20,phy:75} },
+                { id: 'b13', name: 'Tiquinho S.', pos: 'ST', ovr: 79, starter: false, val: 8000000, stats: {pac:71,sho:81,pas:70,def:35,phy:80} }
+            ]},
+            { id: 'vas', name: 'Vasco da Gama', short: 'VAS', color: '#000000', rep: 78, budget: 22000000, realTrophies: { br: 4, lib: 1, copa: 1 }, stadium: 'São Januário', players: [
+                { id: 'v1', name: 'Léo Jardim', pos: 'GK', ovr: 79, starter: true, val: 9000000, stats: {pac:40,sho:20,pas:65,def:20,phy:78} },
+                { id: 'v2', name: 'Léo Pelé', pos: 'CB', ovr: 76, starter: true, val: 5000000, stats: {pac:75,sho:40,pas:68,def:76,phy:76} },
+                { id: 'v3', name: 'Maicon', pos: 'CB', ovr: 74, starter: true, val: 1000000, stats: {pac:52,sho:35,pas:60,def:75,phy:78} },
+                { id: 'v4', name: 'Lucas Piton', pos: 'LB', ovr: 77, starter: true, val: 8000000, stats: {pac:82,sho:62,pas:76,def:74,phy:72} },
+                { id: 'v5', name: 'Puma Rodríguez', pos: 'RB', ovr: 75, starter: true, val: 4500000, stats: {pac:81,sho:60,pas:71,def:72,phy:73} },
+                { id: 'v6', name: 'Hugo Moura', pos: 'CDM', ovr: 76, starter: true, val: 6000000, stats: {pac:70,sho:62,pas:73,def:77,phy:78} },
+                { id: 'v7', name: 'Mateus Carvalho', pos: 'CM', ovr: 75, starter: true, val: 5000000, stats: {pac:74,sho:64,pas:72,def:74,phy:75} },
+                { id: 'v8', name: 'Dimitri Payet', pos: 'CAM', ovr: 79, starter: true, val: 5000000, stats: {pac:66,sho:80,pas:85,def:38,phy:68} },
+                { id: 'v9', name: 'Adson', pos: 'RW', ovr: 76, starter: true, val: 7000000, stats: {pac:86,sho:72,pas:72,def:40,phy:62} },
+                { id: 'v10', name: 'David', pos: 'LW', ovr: 75, starter: true, val: 4000000, stats: {pac:84,sho:72,pas:66,def:38,phy:76} },
+                { id: 'v11', name: 'Pablo Vegetti', pos: 'ST', ovr: 79, starter: true, val: 6000000, stats: {pac:68,sho:82,pas:62,def:38,phy:86} },
+                { id: 'v12', name: 'Keiller', pos: 'GK', ovr: 72, starter: false, val: 1000000, stats: {pac:38,sho:20,pas:60,def:20,phy:72} },
+                { id: 'v13', name: 'Sforza', pos: 'CDM', ovr: 75, starter: false, val: 6000000, stats: {pac:71,sho:60,pas:74,def:75,phy:73} }
+            ]},
+            { id: 'flu', name: 'Fluminense', short: 'FLU', color: '#991b1b', rep: 83, budget: 30000000, realTrophies: { br: 4, lib: 1, copa: 1 }, stadium: 'Maracanã', players: [
+                { id: 'fl1', name: 'Fábio', pos: 'GK', ovr: 78, starter: true, val: 2000000, stats: {pac:38,sho:20,pas:70,def:20,phy:76} },
+                { id: 'fl2', name: 'Thiago Silva', pos: 'CB', ovr: 84, starter: true, val: 6000000, stats: {pac:65,sho:50,pas:78,def:87,phy:78} },
+                { id: 'fl3', name: 'Felipe Melo', pos: 'CB', ovr: 75, starter: true, val: 1000000, stats: {pac:52,sho:60,pas:72,def:76,phy:78} },
+                { id: 'fl4', name: 'Marcelo', pos: 'LB', ovr: 78, starter: true, val: 4000000, stats: {pac:72,sho:77,pas:83,def:70,phy:70} },
+                { id: 'fl5', name: 'Samuel Xavier', pos: 'RB', ovr: 76, starter: true, val: 3000000, stats: {pac:76,sho:60,pas:72,def:75,phy:72} },
+                { id: 'fl6', name: 'André', pos: 'CDM', ovr: 81, starter: true, val: 25000000, stats: {pac:75,sho:62,pas:80,def:83,phy:79} },
+                { id: 'fl7', name: 'Martinelli', pos: 'CM', ovr: 77, starter: true, val: 10000000, stats: {pac:74,sho:65,pas:76,def:75,phy:75} },
+                { id: 'fl8', name: 'Ganso', pos: 'CAM', ovr: 77, starter: true, val: 3000000, stats: {pac:58,sho:74,pas:84,def:48,phy:64} },
+                { id: 'fl9', name: 'J. Arias', pos: 'RW', ovr: 81, starter: true, val: 22000000, stats: {pac:86,sho:77,pas:80,def:52,phy:68} },
+                { id: 'fl10', name: 'Keno', pos: 'LW', ovr: 77, starter: true, val: 4000000, stats: {pac:84,sho:75,pas:72,def:38,phy:70} },
+                { id: 'fl11', name: 'Germán Cano', pos: 'ST', ovr: 80, starter: true, val: 5000000, stats: {pac:70,sho:85,pas:66,def:32,phy:74} },
+                { id: 'fl12', name: 'A. Eudes', pos: 'GK', ovr: 72, starter: false, val: 1000000, stats: {pac:38,sho:20,pas:60,def:20,phy:72} }
+            ]},
+            { id: 'cor', name: 'Corinthians', short: 'COR', color: '#334155', rep: 85, budget: 35000000, realTrophies: { br: 7, lib: 1, copa: 3 }, stadium: 'Neo Química Arena', players: [
+                { id: 'c1', name: 'Hugo Souza', pos: 'GK', ovr: 77, starter: true, val: 6000000, stats: {pac:40,sho:20,pas:65,def:20,phy:77} },
+                { id: 'c2', name: 'A. Ramalho', pos: 'CB', ovr: 78, starter: true, val: 7000000, stats: {pac:68,sho:50,pas:72,def:80,phy:79} },
+                { id: 'c3', name: 'Félix Torres', pos: 'CB', ovr: 77, starter: true, val: 6000000, stats: {pac:72,sho:40,pas:65,def:78,phy:81} },
+                { id: 'c4', name: 'Hugo', pos: 'LB', ovr: 75, starter: true, val: 4000000, stats: {pac:82,sho:60,pas:68,def:72,phy:73} },
+                { id: 'c5', name: 'Matheuzinho', pos: 'RB', ovr: 76, starter: true, val: 5000000, stats: {pac:84,sho:58,pas:70,def:73,phy:72} },
+                { id: 'c6', name: 'Raniele', pos: 'CDM', ovr: 77, starter: true, val: 8000000, stats: {pac:73,sho:62,pas:72,def:80,phy:83} },
+                { id: 'c7', name: 'Breno Bidon', pos: 'CM', ovr: 76, starter: true, val: 9000000, stats: {pac:75,sho:70,pas:76,def:72,phy:73} },
+                { id: 'c8', name: 'R. Garro', pos: 'CAM', ovr: 79, starter: true, val: 15000000, stats: {pac:75,sho:78,pas:84,def:52,phy:68} },
+                { id: 'c9', name: 'Wesley', pos: 'LW', ovr: 77, starter: true, val: 12000000, stats: {pac:88,sho:74,pas:70,def:35,phy:70} },
+                { id: 'c10', name: 'Yuri Alberto', pos: 'ST', ovr: 77, starter: true, val: 13000000, stats: {pac:86,sho:77,pas:68,def:36,phy:74} },
+                { id: 'c11', name: 'Memphis Depay', pos: 'ST', ovr: 82, starter: true, val: 20000000, stats: {pac:83,sho:83,pas:81,def:38,phy:77} },
+                { id: 'c12', name: 'Donelli', pos: 'GK', ovr: 72, starter: false, val: 1000000, stats: {pac:38,sho:20,pas:60,def:20,phy:72} }
+            ]},
+            { id: 'int', name: 'Internacional', short: 'INT', color: '#b91c1c', rep: 81, budget: 28000000, realTrophies: { br: 3, lib: 2, copa: 1 }, stadium: 'Beira-Rio', players: [
+                { id: 'in1', name: 'S. Rochet', pos: 'GK', ovr: 79, starter: true, val: 8000000, stats: {pac:42,sho:20,pas:68,def:20,phy:78} },
+                { id: 'in2', name: 'Vitão', pos: 'CB', ovr: 78, starter: true, val: 9000000, stats: {pac:73,sho:40,pas:68,def:80,phy:77} },
+                { id: 'in3', name: 'G. Mercado', pos: 'CB', ovr: 76, starter: true, val: 2000000, stats: {pac:62,sho:50,pas:68,def:78,phy:77} },
+                { id: 'in4', name: 'Renê', pos: 'LB', ovr: 76, starter: true, val: 3000000, stats: {pac:75,sho:55,pas:72,def:75,phy:72} },
+                { id: 'in5', name: 'F. Bustos', pos: 'RB', ovr: 77, starter: true, val: 7000000, stats: {pac:84,sho:60,pas:73,def:74,phy:74} },
+                { id: 'in6', name: 'Thiago Maia', pos: 'CDM', ovr: 77, starter: true, val: 8000000, stats: {pac:71,sho:62,pas:76,def:78,phy:76} },
+                { id: 'in7', name: 'B. Henrique', pos: 'CM', ovr: 77, starter: true, val: 6000000, stats: {pac:73,sho:70,pas:76,def:74,phy:75} },
+                { id: 'in8', name: 'Alan Patrick', pos: 'CAM', ovr: 79, starter: true, val: 8000000, stats: {pac:70,sho:77,pas:83,def:48,phy:66} },
+                { id: 'in9', name: 'Wanderson', pos: 'LW', ovr: 78, starter: true, val: 10000000, stats: {pac:86,sho:75,pas:74,def:40,phy:69} },
+                { id: 'in10', name: 'Wesley', pos: 'RW', ovr: 76, starter: true, val: 6000000, stats: {pac:88,sho:73,pas:68,def:38,phy:70} },
+                { id: 'in11', name: 'E. Valencia', pos: 'ST', ovr: 79, starter: true, val: 6000000, stats: {pac:84,sho:79,pas:71,def:38,phy:75} },
+                { id: 'in12', name: 'Anthoni', pos: 'GK', ovr: 72, starter: false, val: 1000000, stats: {pac:38,sho:20,pas:60,def:20,phy:72} }
+            ]},
+            { id: 'gre', name: 'Grêmio', short: 'GRE', color: '#0284c7', rep: 82, budget: 27000000, realTrophies: { br: 2, lib: 3, copa: 5 }, stadium: 'Arena do Grêmio', players: [
+                { id: 'g1', name: 'Marchesín', pos: 'GK', ovr: 77, starter: true, val: 3000000, stats: {pac:40,sho:20,pas:68,def:20,phy:76} },
+                { id: 'g2', name: 'Kannemann', pos: 'CB', ovr: 77, starter: true, val: 3000000, stats: {pac:64,sho:45,pas:65,def:80,phy:81} },
+                { id: 'g3', name: 'Geromel', pos: 'CB', ovr: 76, starter: true, val: 1000000, stats: {pac:55,sho:40,pas:72,def:79,phy:72} },
+                { id: 'g4', name: 'Reinaldo', pos: 'LB', ovr: 76, starter: true, val: 2500000, stats: {pac:76,sho:74,pas:75,def:72,phy:74} },
+                { id: 'g5', name: 'João Pedro', pos: 'RB', ovr: 75, starter: true, val: 4000000, stats: {pac:82,sho:55,pas:70,def:72,phy:72} },
+                { id: 'g6', name: 'Villasanti', pos: 'CDM', ovr: 79, starter: true, val: 14000000, stats: {pac:74,sho:68,pas:77,def:80,phy:82} },
+                { id: 'g7', name: 'Pepê', pos: 'CM', ovr: 76, starter: true, val: 7000000, stats: {pac:75,sho:66,pas:75,def:74,phy:74} },
+                { id: 'g8', name: 'Cristaldo', pos: 'CAM', ovr: 77, starter: true, val: 11000000, stats: {pac:74,sho:76,pas:79,def:46,phy:68} },
+                { id: 'g9', name: 'Soteldo', pos: 'LW', ovr: 78, starter: true, val: 9000000, stats: {pac:89,sho:72,pas:76,def:32,phy:58} },
+                { id: 'g10', name: 'Pavón', pos: 'RW', ovr: 77, starter: true, val: 8000000, stats: {pac:87,sho:74,pas:74,def:40,phy:72} },
+                { id: 'g11', name: 'Braithwaite', pos: 'ST', ovr: 77, starter: true, val: 7000000, stats: {pac:80,sho:78,pas:70,def:36,phy:75} },
+                { id: 'g12', name: 'Caíque', pos: 'GK', ovr: 73, starter: false, val: 1500000, stats: {pac:38,sho:20,pas:62,def:20,phy:74} }
+            ]},
+            { id: 'cru', name: 'Cruzeiro', short: 'CRU', color: '#1d4ed8', rep: 81, budget: 28000000, realTrophies: { br: 4, lib: 2, copa: 6 }, stadium: 'Mineirão', players: [
+                { id: 'cr1', name: 'Cássio', pos: 'GK', ovr: 78, starter: true, val: 3000000, stats: {pac:38,sho:20,pas:68,def:20,phy:78} },
+                { id: 'cr2', name: 'Zé Ivaldo', pos: 'CB', ovr: 76, starter: true, val: 5000000, stats: {pac:68,sho:48,pas:66,def:77,phy:80} },
+                { id: 'cr3', name: 'João Marcelo', pos: 'CB', ovr: 75, starter: true, val: 4000000, stats: {pac:72,sho:38,pas:64,def:76,phy:76} },
+                { id: 'cr4', name: 'Marlon', pos: 'LB', ovr: 77, starter: true, val: 6000000, stats: {pac:82,sho:65,pas:75,def:75,phy:73} },
+                { id: 'cr5', name: 'William', pos: 'RB', ovr: 76, starter: true, val: 5000000, stats: {pac:83,sho:62,pas:72,def:73,phy:72} },
+                { id: 'cr6', name: 'Lucas Romero', pos: 'CDM', ovr: 77, starter: true, val: 6000000, stats: {pac:74,sho:60,pas:75,def:78,phy:81} },
+                { id: 'cr7', name: 'Lucas Silva', pos: 'CM', ovr: 75, starter: true, val: 2500000, stats: {pac:68,sho:70,pas:76,def:72,phy:73} },
+                { id: 'cr8', name: 'M. Pereira', pos: 'CAM', ovr: 80, starter: true, val: 16000000, stats: {pac:76,sho:77,pas:83,def:48,phy:67} },
+                { id: 'cr9', name: 'G. Veron', pos: 'RW', ovr: 75, starter: true, val: 6000000, stats: {pac:87,sho:72,pas:68,def:35,phy:68} },
+                { id: 'cr10', name: 'A. Gomes', pos: 'LW', ovr: 76, starter: true, val: 7000000, stats: {pac:86,sho:73,pas:70,def:38,phy:70} },
+                { id: 'cr11', name: 'J. Dinenno', pos: 'ST', ovr: 77, starter: true, val: 7000000, stats: {pac:74,sho:79,pas:65,def:35,phy:79} },
+                { id: 'cr12', name: 'Anderson', pos: 'GK', ovr: 72, starter: false, val: 1000000, stats: {pac:38,sho:20,pas:60,def:20,phy:72} }
+            ]},
+            { id: 'bah', name: 'Bahia', short: 'BAH', color: '#0284c7', rep: 77, budget: 35000000, realTrophies: { br: 2, lib: 0, copa: 0 }, stadium: 'Arena Fonte Nova', players: [
+                { id: 'ba1', name: 'M. Felipe', pos: 'GK', ovr: 76, starter: true, val: 4000000, stats: {pac:40,sho:20,pas:65,def:20,phy:75} },
+                { id: 'ba2', name: 'Kanu', pos: 'CB', ovr: 76, starter: true, val: 5000000, stats: {pac:66,sho:40,pas:65,def:77,phy:79} },
+                { id: 'ba3', name: 'G. Xavier', pos: 'CB', ovr: 75, starter: true, val: 4500000, stats: {pac:70,sho:38,pas:66,def:75,phy:74} },
+                { id: 'ba4', name: 'L. Juba', pos: 'LB', ovr: 76, starter: true, val: 6000000, stats: {pac:80,sho:72,pas:75,def:70,phy:72} },
+                { id: 'ba5', name: 'S. Arias', pos: 'RB', ovr: 77, starter: true, val: 5000000, stats: {pac:84,sho:60,pas:73,def:75,phy:75} },
+                { id: 'ba6', name: 'Caio Alexandre', pos: 'CDM', ovr: 77, starter: true, val: 8000000, stats: {pac:73,sho:65,pas:76,def:78,phy:76} },
+                { id: 'ba7', name: 'Jean Lucas', pos: 'CM', ovr: 77, starter: true, val: 9000000, stats: {pac:77,sho:70,pas:77,def:74,phy:78} },
+                { id: 'ba8', name: 'E. Ribeiro', pos: 'CAM', ovr: 78, starter: true, val: 5000000, stats: {pac:72,sho:74,pas:82,def:55,phy:63} },
+                { id: 'ba9', name: 'Cauly', pos: 'CAM', ovr: 78, starter: true, val: 10000000, stats: {pac:78,sho:75,pas:79,def:48,phy:68} },
+                { id: 'ba10', name: 'Thaciano', pos: 'ST', ovr: 76, starter: true, val: 5000000, stats: {pac:75,sho:76,pas:70,def:45,phy:76} },
+                { id: 'ba11', name: 'Everaldo', pos: 'ST', ovr: 76, starter: true, val: 4000000, stats: {pac:74,sho:77,pas:68,def:32,phy:75} },
+                { id: 'ba12', name: 'Adriel', pos: 'GK', ovr: 72, starter: false, val: 1500000, stats: {pac:38,sho:20,pas:60,def:20,phy:72} }
+            ]},
+            { id: 'cap', name: 'Athletico-PR', short: 'CAP', color: '#b91c1c', rep: 79, budget: 32000000, realTrophies: { br: 1, lib: 0, copa: 1 }, stadium: 'Ligga Arena', players: [
+                { id: 'cp1', name: 'Bento', pos: 'GK', ovr: 81, starter: true, val: 18000000, stats: {pac:45,sho:20,pas:70,def:20,phy:80} },
+                { id: 'cp2', name: 'Thiago Heleno', pos: 'CB', ovr: 76, starter: true, val: 1500000, stats: {pac:58,sho:45,pas:62,def:79,phy:82} },
+                { id: 'cp3', name: 'KAIQUE Rocha', pos: 'CB', ovr: 75, starter: true, val: 5000000, stats: {pac:70,sho:35,pas:64,def:76,phy:76} },
+                { id: 'cp4', name: 'Esquivel', pos: 'LB', ovr: 76, starter: true, val: 6500000, stats: {pac:80,sho:58,pas:71,def:74,phy:73} },
+                { id: 'cp5', name: 'Leo Godoy', pos: 'RB', ovr: 75, starter: true, val: 5000000, stats: {pac:82,sho:58,pas:70,def:72,phy:73} },
+                { id: 'cp6', name: 'Fernandinho', pos: 'CDM', ovr: 78, starter: true, val: 1000000, stats: {pac:58,sho:72,pas:82,def:79,phy:75} },
+                { id: 'cp7', name: 'Erick', pos: 'CM', ovr: 76, starter: true, val: 7000000, stats: {pac:75,sho:68,pas:74,def:75,phy:77} },
+                { id: 'cp8', name: 'Zapelli', pos: 'CAM', ovr: 76, starter: true, val: 9000000, stats: {pac:73,sho:72,pas:79,def:44,phy:66} },
+                { id: 'cp9', name: 'Canobbio', pos: 'RW', ovr: 77, starter: true, val: 10000000, stats: {pac:88,sho:72,pas:70,def:52,phy:78} },
+                { id: 'cp10', name: 'Cuello', pos: 'LW', ovr: 75, starter: true, val: 5000000, stats: {pac:85,sho:70,pas:68,def:42,phy:72} },
+                { id: 'cp11', name: 'Mestrovic', pos: 'ST', ovr: 76, starter: true, val: 7000000, stats: {pac:76,sho:77,pas:65,def:32,phy:76} },
+                { id: 'cp12', name: 'Léo Linck', pos: 'GK', ovr: 72, starter: false, val: 1500000, stats: {pac:38,sho:20,pas:60,def:20,phy:72} }
+            ]},
+            { id: 'for', name: 'Fortaleza', short: 'FOR', color: '#2563eb', rep: 78, budget: 22000000, realTrophies: { br: 0, lib: 0, copa: 0 }, stadium: 'Castelão', players: [
+                { id: 'fo1', name: 'João Ricardo', pos: 'GK', ovr: 77, starter: true, val: 3000000, stats: {pac:40,sho:20,pas:64,def:20,phy:76} },
+                { id: 'fo2', name: 'Titi', pos: 'CB', ovr: 75, starter: true, val: 1000000, stats: {pac:60,sho:38,pas:62,def:76,phy:78} },
+                { id: 'fo3', name: 'Britez', pos: 'CB', ovr: 76, starter: true, val: 3000000, stats: {pac:68,sho:40,pas:65,def:77,phy:80} },
+                { id: 'fo4', name: 'Bruno Pacheco', pos: 'LB', ovr: 75, starter: true, val: 3000000, stats: {pac:78,sho:55,pas:70,def:74,phy:72} },
+                { id: 'fo5', name: 'Tinga', pos: 'RB', ovr: 76, starter: true, val: 3000000, stats: {pac:80,sho:58,pas:68,def:76,phy:76} },
+                { id: 'fo6', name: 'Hércules', pos: 'CDM', ovr: 76, starter: true, val: 8000000, stats: {pac:76,sho:68,pas:73,def:75,phy:77} },
+                { id: 'fo7', name: 'Lucas Sasha', pos: 'CM', ovr: 75, starter: true, val: 2000000, stats: {pac:72,sho:62,pas:73,def:74,phy:75} },
+                { id: 'fo8', name: 'Pochettino', pos: 'CAM', ovr: 77, starter: true, val: 7000000, stats: {pac:72,sho:75,pas:80,def:48,phy:67} },
+                { id: 'fo9', name: 'Yago Pikachu', pos: 'RW', ovr: 76, starter: true, val: 3000000, stats: {pac:82,sho:76,pas:72,def:55,phy:68} },
+                { id: 'fo10', name: 'Moisés', pos: 'LW', ovr: 76, starter: true, val: 6000000, stats: {pac:88,sho:74,pas:68,def:38,phy:72} },
+                { id: 'fo11', name: 'Lucero', pos: 'ST', ovr: 78, starter: true, val: 6000000, stats: {pac:75,sho:80,pas:68,def:35,phy:76} },
+                { id: 'fo12', name: 'Kozlinski', pos: 'GK', ovr: 71, starter: false, val: 500000, stats: {pac:38,sho:20,pas:58,def:20,phy:70} }
+            ]},
+            { id: 'rbb', name: 'Red Bull Bragantino', short: 'RBB', color: '#b91c1c', rep: 76, budget: 30000000, realTrophies: { br: 0, lib: 0, copa: 0 }, stadium: 'Nabizão', players: [
+                { id: 'rb1', name: 'Cleiton', pos: 'GK', ovr: 76, starter: true, val: 6000000, stats: {pac:40,sho:20,pas:68,def:20,phy:75} },
+                { id: 'rb2', name: 'Léo Ortiz (Ex)', pos: 'CB', ovr: 75, starter: true, val: 4000000, stats: {pac:68,sho:40,pas:66,def:76,phy:75} },
+                { id: 'rb3', name: 'Pedro Henrique', pos: 'CB', ovr: 75, starter: true, val: 4000000, stats: {pac:69,sho:38,pas:63,def:76,phy:77} },
+                { id: 'rb4', name: 'Luan Cândido', pos: 'LB', ovr: 76, starter: true, val: 8000000, stats: {pac:82,sho:68,pas:72,def:73,phy:76} },
+                { id: 'rb5', name: 'Andres Hurtado', pos: 'RB', ovr: 75, starter: true, val: 5000000, stats: {pac:84,sho:55,pas:68,def:72,phy:72} },
+                { id: 'rb6', name: 'Jadsom', pos: 'CDM', ovr: 76, starter: true, val: 7000000, stats: {pac:75,sho:62,pas:73,def:76,phy:77} },
+                { id: 'rb7', name: 'Lucas Evangelista', pos: 'CM', ovr: 77, starter: true, val: 8000000, stats: {pac:74,sho:72,pas:78,def:72,phy:74} },
+                { id: 'rb8', name: 'Lincoln', pos: 'CAM', ovr: 75, starter: true, val: 5000000, stats: {pac:73,sho:71,pas:76,def:42,phy:64} },
+                { id: 'rb9', name: 'Helinho', pos: 'RW', ovr: 77, starter: true, val: 11000000, stats: {pac:88,sho:76,pas:73,def:38,phy:66} },
+                { id: 'rb10', name: 'Henry Mosquera', pos: 'LW', ovr: 75, starter: true, val: 6000000, stats: {pac:90,sho:70,pas:67,def:35,phy:68} },
+                { id: 'rb11', name: 'Eduardo Sasha', pos: 'ST', ovr: 76, starter: true, val: 4000000, stats: {pac:76,sho:77,pas:70,def:40,phy:72} },
+                { id: 'rb12', name: 'Lucão', pos: 'GK', ovr: 71, starter: false, val: 1000000, stats: {pac:38,sho:20,pas:58,def:20,phy:70} }
+            ]},
+            { id: 'ju2', name: 'Juventude', short: 'JUV', color: '#16a34a', rep: 71, budget: 10000000, realTrophies: { br: 0, lib: 0, copa: 1 }, stadium: 'Alfredo Jaconi', players: [
+                { id: 'j1', name: 'Gabriel', pos: 'GK', ovr: 74, starter: true, val: 2000000, stats: {pac:38,sho:20,pas:60,def:20,phy:74} },
+                { id: 'j2', name: 'Zé Marcos', pos: 'CB', ovr: 73, starter: true, val: 1500000, stats: {pac:64,sho:35,pas:60,def:74,phy:75} },
+                { id: 'j3', name: 'Danilo Boza', pos: 'CB', ovr: 74, starter: true, val: 2500000, stats: {pac:68,sho:38,pas:62,def:75,phy:76} },
+                { id: 'j4', name: 'Alan Ruschel', pos: 'LB', ovr: 73, starter: true, val: 800000, stats: {pac:72,sho:60,pas:71,def:72,phy:70} },
+                { id: 'j5', name: 'Ewerthon', pos: 'RB', ovr: 72, starter: true, val: 1200000, stats: {pac:78,sho:50,pas:65,def:70,phy:70} },
+                { id: 'j6', name: 'Jadson', pos: 'CDM', ovr: 74, starter: true, val: 2000000, stats: {pac:71,sho:60,pas:71,def:74,phy:75} },
+                { id: 'j7', name: 'Caique Goncalves', pos: 'CM', ovr: 73, starter: true, val: 1500000, stats: {pac:70,sho:62,pas:70,def:72,phy:74} },
+                { id: 'j8', name: 'Nenê', pos: 'CAM', ovr: 73, starter: true, val: 300000, stats: {pac:50,sho:75,pas:80,def:35,phy:58} },
+                { id: 'j9', name: 'Lucas Barbosa', pos: 'RW', ovr: 75, starter: true, val: 4000000, stats: {pac:82,sho:74,pas:70,def:45,phy:75} },
+                { id: 'j10', name: 'Erick Furtado', pos: 'LW', ovr: 73, starter: true, val: 1800000, stats: {pac:84,sho:70,pas:65,def:35,phy:68} },
+                { id: 'j11', name: 'Gilberto', pos: 'ST', ovr: 74, starter: true, val: 1200000, stats: {pac:72,sho:76,pas:64,def:32,phy:74} },
+                { id: 'j12', name: 'Mateus Claus', pos: 'GK', ovr: 70, starter: false, val: 500000, stats: {pac:38,sho:20,pas:56,def:20,phy:70} }
+            ]},
+            { id: 'cri', name: 'Criciúma', short: 'CRI', color: '#eab308', rep: 70, budget: 9000000, realTrophies: { br: 0, lib: 0, copa: 1 }, stadium: 'Heriberto Hülse', players: [
+                { id: 'cr1', name: 'Gustavo', pos: 'GK', ovr: 74, starter: true, val: 2000000, stats: {pac:38,sho:20,pas:62,def:20,phy:74} },
+                { id: 'cr2', name: 'Rodrigo', pos: 'CB', ovr: 73, starter: true, val: 1200000, stats: {pac:62,sho:35,pas:60,def:74,phy:76} },
+                { id: 'cr3', name: 'Wilker Ángel', pos: 'CB', ovr: 73, starter: true, val: 1500000, stats: {pac:65,sho:38,pas:62,def:74,phy:77} },
+                { id: 'cr4', name: 'Trauco', pos: 'LB', ovr: 74, starter: true, val: 2000000, stats: {pac:74,sho:65,pas:74,def:72,phy:70} },
+                { id: 'cr5', name: 'Claudinho', pos: 'RB', ovr: 73, starter: true, val: 2000000, stats: {pac:80,sho:55,pas:68,def:71,phy:71} },
+                { id: 'cr6', name: 'Barreto', pos: 'CDM', ovr: 73, starter: true, val: 1500000, stats: {pac:70,sho:58,pas:70,def:74,phy:75} },
+                { id: 'cr7', name: 'Fellipe Mateus', pos: 'CM', ovr: 74, starter: true, val: 1800000, stats: {pac:72,sho:70,pas:75,def:65,phy:68} },
+                { id: 'cr8', name: 'Matheusinho', pos: 'CAM', ovr: 74, starter: true, val: 2500000, stats: {pac:78,sho:71,pas:74,def:42,phy:64} },
+                { id: 'cr9', name: 'Allano', pos: 'RW', ovr: 73, starter: true, val: 1800000, stats: {pac:85,sho:69,pas:66,def:35,phy:70} },
+                { id: 'cr10', name: 'Arthur Caíke', pos: 'LW', ovr: 73, starter: true, val: 1500000, stats: {pac:82,sho:73,pas:67,def:35,phy:71} },
+                { id: 'cr11', name: 'Yannick Bolasie', pos: 'ST', ovr: 76, starter: true, val: 2500000, stats: {pac:83,sho:76,pas:72,def:38,phy:78} },
+                { id: 'cr12', name: 'Alisson', pos: 'GK', ovr: 69, starter: false, val: 400000, stats: {pac:38,sho:20,pas:55,def:20,phy:68} }
+            ]},
+            { id: 'vit', name: 'Vitória', short: 'VIT', color: '#dc2626', rep: 71, budget: 11000000, realTrophies: { br: 0, lib: 0, copa: 0 }, stadium: 'Barradão', players: [
+                { id: 'v1', name: 'Lucas Arcanjo', pos: 'GK', ovr: 75, starter: true, val: 3000000, stats: {pac:40,sho:20,pas:62,def:20,phy:75} },
+                { id: 'v2', name: 'Wagner Leonardo', pos: 'CB', ovr: 75, starter: true, val: 4000000, stats: {pac:70,sho:45,pas:65,def:76,phy:77} },
+                { id: 'v3', name: 'Camutanga', pos: 'CB', ovr: 73, starter: true, val: 1500000, stats: {pac:64,sho:38,pas:60,def:74,phy:76} },
+                { id: 'v4', name: 'Lucas Esteves', pos: 'LB', ovr: 73, starter: true, val: 2000000, stats: {pac:80,sho:55,pas:68,def:71,phy:71} },
+                { id: 'v5', name: 'Willean Leppo', pos: 'RB', ovr: 72, starter: true, val: 1500000, stats: {pac:78,sho:52,pas:66,def:71,phy:72} },
+                { id: 'v6', name: 'Luan Santos', pos: 'CDM', ovr: 74, starter: true, val: 3000000, stats: {pac:71,sho:60,pas:72,def:75,phy:76} },
+                { id: 'v7', name: 'Willian Oliveira', pos: 'CDM', ovr: 73, starter: true, val: 1500000, stats: {pac:68,sho:58,pas:69,def:74,phy:77} },
+                { id: 'v8', name: 'Matheusinho', pos: 'CAM', ovr: 75, starter: true, val: 4000000, stats: {pac:82,sho:72,pas:75,def:45,phy:65} },
+                { id: 'v9', name: 'Osvaldo', pos: 'RW', ovr: 74, starter: true, val: 800000, stats: {pac:80,sho:72,pas:72,def:38,phy:66} },
+                { id: 'v10', name: 'Janderson', pos: 'LW', ovr: 73, starter: true, val: 2000000, stats: {pac:85,sho:69,pas:65,def:35,phy:72} },
+                { id: 'v11', name: 'Alerrandro', pos: 'ST', ovr: 74, starter: true, val: 3000000, stats: {pac:76,sho:75,pas:66,def:32,phy:74} },
+                { id: 'v12', name: 'Muriel', pos: 'GK', ovr: 71, starter: false, val: 500000, stats: {pac:38,sho:20,pas:58,def:20,phy:70} }
+            ]},
+            { id: 'acg', name: 'Atlético-GO', short: 'ACG', color: '#dc2626', rep: 70, budget: 8000000, realTrophies: { br: 0, lib: 0, copa: 0 }, stadium: 'Antonio Accioly', players: [
+                { id: 'ag1', name: 'Ronaldo', pos: 'GK', ovr: 74, starter: true, val: 2000000, stats: {pac:38,sho:20,pas:60,def:20,phy:74} },
+                { id: 'ag2', name: 'Adriano Martins', pos: 'CB', ovr: 72, starter: true, val: 1200000, stats: {pac:65,sho:35,pas:58,def:73,phy:74} },
+                { id: 'ag3', name: 'Pedro Henrique', pos: 'CB', ovr: 73, starter: true, val: 1500000, stats: {pac:66,sho:35,pas:60,def:74,phy:75} },
+                { id: 'ag4', name: 'Guilherme Romão', pos: 'LB', ovr: 73, starter: true, val: 1800000, stats: {pac:80,sho:55,pas:67,def:71,phy:71} },
+                { id: 'ag5', name: 'Maguinho', pos: 'RB', ovr: 72, starter: true, val: 1000000, stats: {pac:79,sho:50,pas:65,def:70,phy:72} },
+                { id: 'ag6', name: 'Baralhas', pos: 'CDM', ovr: 74, starter: true, val: 2500000, stats: {pac:72,sho:65,pas:71,def:75,phy:77} },
+                { id: 'ag7', name: 'Rhaldney', pos: 'CM', ovr: 73, starter: true, val: 1800000, stats: {pac:72,sho:60,pas:70,def:73,phy:74} },
+                { id: 'ag8', name: 'Shaylon', pos: 'CAM', ovr: 75, starter: true, val: 3500000, stats: {pac:76,sho:73,pas:77,def:42,phy:66} },
+                { id: 'ag9', name: 'Alejo Cruz', pos: 'RW', ovr: 73, starter: true, val: 2000000, stats: {pac:82,sho:70,pas:70,def:40,phy:65} },
+                { id: 'ag10', name: 'Luiz Fernando', pos: 'LW', ovr: 75, starter: true, val: 3000000, stats: {pac:84,sho:76,pas:71,def:38,phy:72} },
+                { id: 'ag11', name: 'Emiliano Rodríguez', pos: 'ST', ovr: 73, starter: true, val: 2000000, stats: {pac:78,sho:73,pas:62,def:30,phy:73} },
+                { id: 'ag12', name: 'Pedro Rangel', pos: 'GK', ovr: 70, starter: false, val: 500000, stats: {pac:38,sho:20,pas:56,def:20,phy:70} }
+            ]},
+            { id: 'cui', name: 'Cuiabá', short: 'CUI', color: '#15803d', rep: 71, budget: 10000000, realTrophies: { br: 0, lib: 0, copa: 0 }, stadium: 'Arena Pantanal', players: [
+                { id: 'cu1', name: 'Walter', pos: 'GK', ovr: 75, starter: true, val: 2000000, stats: {pac:38,sho:20,pas:64,def:20,phy:76} },
+                { id: 'cu2', name: 'Marllon', pos: 'CB', ovr: 74, starter: true, val: 1800000, stats: {pac:64,sho:38,pas:62,def:75,phy:77} },
+                { id: 'cu3', name: 'Bruno Alves', pos: 'CB', ovr: 74, starter: true, val: 1500000, stats: {pac:62,sho:40,pas:62,def:75,phy:76} },
+                { id: 'cu4', name: 'Ramon', pos: 'LB', ovr: 73, starter: true, val: 2000000, stats: {pac:80,sho:52,pas:67,def:71,phy:71} },
+                { id: 'cu5', name: 'Matheus Alexandre', pos: 'RB', ovr: 73, starter: true, val: 2200000, stats: {pac:81,sho:50,pas:66,def:72,phy:73} },
+                { id: 'cu6', name: 'Lucas Mineiro', pos: 'CDM', ovr: 74, starter: true, val: 2500000, stats: {pac:70,sho:62,pas:72,def:75,phy:77} },
+                { id: 'cu7', name: 'Denilson', pos: 'CM', ovr: 74, starter: true, val: 3000000, stats: {pac:74,sho:64,pas:73,def:73,phy:74} },
+                { id: 'cu8', name: 'Fernando Sobral', pos: 'CM', ovr: 74, starter: true, val: 2500000, stats: {pac:73,sho:68,pas:74,def:73,phy:75} },
+                { id: 'cu9', name: 'Jonathan Cafú', pos: 'RW', ovr: 73, starter: true, val: 1500000, stats: {pac:84,sho:68,pas:67,def:38,phy:70} },
+                { id: 'cu10', name: 'Derik Lacerda', pos: 'LW', ovr: 73, starter: true, val: 2000000, stats: {pac:85,sho:71,pas:64,def:35,phy:75} },
+                { id: 'cu11', name: 'Isidro Pitta', pos: 'ST', ovr: 75, starter: true, val: 4000000, stats: {pac:78,sho:76,pas:65,def:32,phy:80} },
+                { id: 'cu12', name: 'Mateus Pasinato', pos: 'GK', ovr: 70, starter: false, val: 400000, stats: {pac:38,sho:20,pas:56,def:20,phy:70} }
+            ]},
+            { id: 'juventude', name: 'Vila Nova', short: 'VIL', color: '#dc2626', rep: 68, budget: 5000000, realTrophies: { br: 0, lib: 0, copa: 0 }, stadium: 'OBA', players: [
+                { id: 'vi1', name: 'Dênis Júnior', pos: 'GK', ovr: 72, starter: true, val: 1000000, stats: {pac:38,sho:20,pas:58,def:20,phy:72} },
+                { id: 'vi2', name: 'Quintero', pos: 'CB', ovr: 72, starter: true, val: 800000, stats: {pac:60,sho:35,pas:58,def:73,phy:75} },
+                { id: 'vi3', name: 'Jemmes', pos: 'CB', ovr: 71, starter: true, val: 600000, stats: {pac:62,sho:32,pas:55,def:72,phy:73} },
+                { id: 'vi4', name: 'Rhuan', pos: 'LB', ovr: 71, starter: true, val: 700000, stats: {pac:78,sho:50,pas:64,def:69,phy:68} },
+                { id: 'vi5', name: 'Elias', pos: 'RB', ovr: 71, starter: true, val: 800000, stats: {pac:79,sho:48,pas:63,def:69,phy:70} },
+                { id: 'vi6', name: 'Ralf', pos: 'CDM', ovr: 72, starter: true, val: 200000, stats: {pac:52,sho:55,pas:68,def:75,phy:76} },
+                { id: 'vi7', name: 'Cristiano', pos: 'CM', ovr: 71, starter: true, val: 600000, stats: {pac:70,sho:60,pas:68,def:70,phy:72} },
+                { id: 'vi8', name: 'Igor Henrique', pos: 'CAM', ovr: 72, starter: true, val: 1000000, stats: {pac:74,sho:71,pas:70,def:42,phy:70} },
+                { id: 'vi9', name: 'Junior Todinho', pos: 'RW', ovr: 71, starter: true, val: 800000, stats: {pac:82,sho:68,pas:62,def:35,phy:70} },
+                { id: 'vi10', name: 'Alesson', pos: 'LW', ovr: 72, starter: true, val: 1200000, stats: {pac:84,sho:70,pas:66,def:35,phy:68} },
+                { id: 'vi11', name: 'Henrique Almeida', pos: 'ST', ovr: 71, starter: true, val: 500000, stats: {pac:70,sho:72,pas:62,def:30,phy:72} },
+                { id: 'vi12', name: 'Christofer', pos: 'GK', ovr: 68, starter: false, val: 200000, stats: {pac:38,sho:20,pas:52,def:20,phy:68} }
+            ]},
+            { id: 'spo_rec', name: 'Sport Recife', short: 'SPT', color: '#dc2626', rep: 73, budget: 14000000, realTrophies: { br: 1, lib: 0, copa: 1 }, stadium: 'Ilha do Retiro', players: [
+                { id: 'sp1', name: 'Caíque França', pos: 'GK', ovr: 74, starter: true, val: 2000000, stats: {pac:38,sho:20,pas:60,def:20,phy:74} },
+                { id: 'sp2', name: 'Rafael Thyere', pos: 'CB', ovr: 74, starter: true, val: 1800000, stats: {pac:64,sho:38,pas:62,def:75,phy:76} },
+                { id: 'sp3', name: 'Luciano Castán', pos: 'CB', ovr: 73, starter: true, val: 1000000, stats: {pac:60,sho:35,pas:62,def:74,phy:75} },
+                { id: 'sp4', name: 'Felipinho', pos: 'LB', ovr: 72, starter: true, val: 1500000, stats: {pac:80,sho:55,pas:66,def:70,phy:70} },
+                { id: 'sp5', name: 'Roberto Rosales', pos: 'RB', ovr: 72, starter: true, val: 800000, stats: {pac:74,sho:52,pas:68,def:71,phy:70} },
+                { id: 'sp6', name: 'Felipe', pos: 'CDM', ovr: 73, starter: true, val: 1500000, stats: {pac:68,sho:58,pas:71,def:73,phy:74} },
+                { id: 'sp7', name: 'Fabricio Domínguez', pos: 'CM', ovr: 74, starter: true, val: 2500000, stats: {pac:76,sho:68,pas:72,def:72,phy:76} },
+                { id: 'sp8', name: 'Lucas Lima', pos: 'CAM', ovr: 75, starter: true, val: 2000000, stats: {pac:68,sho:72,pas:80,def:38,phy:62} },
+                { id: 'sp9', name: 'Barletta', pos: 'RW', ovr: 74, starter: true, val: 3000000, stats: {pac:84,sho:72,pas:70,def:38,phy:66} },
+                { id: 'sp10', name: 'Romarinho', pos: 'LW', ovr: 73, starter: true, val: 2000000, stats: {pac:85,sho:69,pas:68,def:35,phy:65} },
+                { id: 'sp11', name: 'Gustavo Coutinho', pos: 'ST', ovr: 74, starter: true, val: 2500000, stats: {pac:76,sho:75,pas:64,def:32,phy:75} },
+                { id: 'sp12', name: 'Thiago Couto', pos: 'GK', ovr: 70, starter: false, val: 500000, stats: {pac:38,sho:20,pas:56,def:20,phy:70} }
+            ]},
+            { id: 'san', name: 'Santos', short: 'SAN', color: '#ffffff', rep: 82, budget: 25000000, realTrophies: { br: 8, lib: 3, copa: 1 }, stadium: 'Vila Belmiro', players: [
+                { id: 'sa1', name: 'Brazão', pos: 'GK', ovr: 75, starter: true, val: 4000000, stats: {pac:40,sho:20,pas:62,def:20,phy:75} },
+                { id: 'sa2', name: 'Gil', pos: 'CB', ovr: 75, starter: true, val: 1000000, stats: {pac:55,sho:40,pas:65,def:77,phy:80} },
+                { id: 'sa3', name: 'Joaquim', pos: 'CB', ovr: 77, starter: true, val: 9000000, stats: {pac:74,sho:42,pas:65,def:79,phy:82} },
+                { id: 'sa4', name: 'Escobar', pos: 'LB', ovr: 74, starter: true, val: 2500000, stats: {pac:78,sho:52,pas:68,def:73,phy:73} },
+                { id: 'sa5', name: 'JP Chermont', pos: 'RB', ovr: 74, starter: true, val: 6000000, stats: {pac:84,sho:58,pas:68,def:71,phy:68} },
+                { id: 'sa6', name: 'João Schmidt', pos: 'CDM', ovr: 76, starter: true, val: 5000000, stats: {pac:70,sho:65,pas:77,def:76,phy:75} },
+                { id: 'sa7', name: 'Diego Pituca', pos: 'CM', ovr: 76, starter: true, val: 5000000, stats: {pac:74,sho:68,pas:76,def:74,phy:75} },
+                { id: 'sa8', name: 'Giuliano', pos: 'CAM', ovr: 76, starter: true, val: 2000000, stats: {pac:66,sho:75,pas:79,def:48,phy:66} },
+                { id: 'sa9', name: 'Otero', pos: 'RW', ovr: 75, starter: true, val: 2500000, stats: {pac:76,sho:80,pas:74,def:42,phy:72} },
+                { id: 'sa10', name: 'Guilherme', pos: 'LW', ovr: 77, starter: true, val: 7000000, stats: {pac:86,sho:76,pas:72,def:40,phy:72} },
+                { id: 'sa11', name: 'Willian Bigode', pos: 'ST', ovr: 74, starter: true, val: 1000000, stats: {pac:74,sho:75,pas:68,def:35,phy:70} },
+                { id: 'sa12', name: 'Diógenes', pos: 'GK', ovr: 68, starter: false, val: 300000, stats: {pac:38,sho:20,pas:52,def:20,phy:68} }
+            ]},
+            { id: 'cea', name: 'Ceará', short: 'CEA', color: '#1e293b', rep: 72, budget: 12000000, realTrophies: { br: 0, lib: 0, copa: 0 }, stadium: 'Castelão', players: [
+                { id: 'ce1', name: 'Richard', pos: 'GK', ovr: 74, starter: true, val: 1800000, stats: {pac:38,sho:20,pas:60,def:20,phy:74} },
+                { id: 'ce2', name: 'Luiz Otávio', pos: 'CB', ovr: 73, starter: true, val: 800000, stats: {pac:58,sho:35,pas:58,def:75,phy:78} },
+                { id: 'ce3', name: 'David Ricardo', pos: 'CB', ovr: 73, starter: true, val: 2000000, stats: {pac:70,sho:35,pas:62,def:73,phy:74} },
+                { id: 'ce4', name: 'Matheus Bahia', pos: 'LB', ovr: 73, starter: true, val: 2000000, stats: {pac:80,sho:52,pas:68,def:71,phy:71} },
+                { id: 'ce5', name: 'Raí Ramos', pos: 'RB', ovr: 72, starter: true, val: 1500000, stats: {pac:78,sho:58,pas:67,def:70,phy:71} },
+                { id: 'ce6', name: 'Richardson', pos: 'CDM', ovr: 73, starter: true, val: 1200000, stats: {pac:70,sho:58,pas:70,def:74,phy:76} },
+                { id: 'ce7', name: 'Lourenço', pos: 'CM', ovr: 73, starter: true, val: 1800000, stats: {pac:74,sho:68,pas:72,def:70,phy:72} },
+                { id: 'ce8', name: 'Lucas Mugni', pos: 'CAM', ovr: 74, starter: true, val: 1500000, stats: {pac:68,sho:70,pas:76,def:45,phy:68} },
+                { id: 'ce9', name: 'Erick Pulga', pos: 'LW', ovr: 76, starter: true, val: 6000000, stats: {pac:89,sho:74,pas:68,def:35,phy:66} },
+                { id: 'ce10', name: 'Saulo Mineiro', pos: 'RW', ovr: 73, starter: true, val: 2000000, stats: {pac:86,sho:71,pas:62,def:38,phy:76} },
+                { id: 'ce11', name: 'Aylon', pos: 'ST', ovr: 73, starter: true, val: 1500000, stats: {pac:74,sho:74,pas:65,def:32,phy:73} },
+                { id: 'ce12', name: 'Bruno Ferreira', pos: 'GK', ovr: 70, starter: false, val: 400000, stats: {pac:38,sho:20,pas:55,def:20,phy:70} }
+            ]}
+        ];
+
+        class UltraManager {
+            constructor() {
+                this.userTeamId = 'fla';
+                this.teams = JSON.parse(JSON.stringify(BRASILEIRAO_TEAMS));
+                this.currentTab = 'dashboard';
+                this.currentRound = 1;
+                this.maxRounds = 38;
+                this.currentYear = 2026;
+                this.fixtures = [];
+                this.standings = [];
+                this.matchHistory = [];
+                this.trophies = [];
+                this.initApp();
+            }
+
+            initApp() {
+                this.generateFixtures();
+                this.initStandings();
+                this.renderHeader();
+                this.switchTab('dashboard');
+            }
+
+            getUserTeam() {
+                return this.teams.find(t => t.id === this.userTeamId);
+            }
+
+            getTeamOvr(team) {
+                const starters = team.players.filter(p => p.starter);
+                if (!starters.length) return 70;
+                const sum = starters.reduce((acc, p) => acc + p.ovr, 0);
+                return Math.round(sum / starters.length);
+            }
+
+            generateFixtures() {
+                const teamIds = this.teams.map(t => t.id);
+                const numTeams = teamIds.length;
+                const rounds = [];
+                
+                // Round Robin schedule generation
+                let tempIds = [...teamIds];
+                for (let round = 0; round < numTeams - 1; round++) {
+                    const roundMatches = [];
+                    for (let i = 0; i < numTeams / 2; i++) {
+                        const home = tempIds[i];
+                        const away = tempIds[numTeams - 1 - i];
+                        roundMatches.push({ home, away, homeGoals: null, awayGoals: null, played: false });
+                    }
+                    rounds.push(roundMatches);
+                    tempIds.splice(1, 0, tempIds.pop());
+                }
+
+                // Second leg (Reverse home/away)
+                const secondLeg = rounds.map(rMatches => {
+                    return rMatches.map(m => ({
+                        home: m.away,
+                        away: m.home,
+                        homeGoals: null,
+                        awayGoals: null,
+                        played: false
+                    }));
+                });
+
+                this.fixtures = [...rounds, ...secondLeg];
+            }
+
+            initStandings() {
+                this.standings = this.teams.map(t => ({
+                    id: t.id,
+                    name: t.name,
+                    short: t.short,
+                    pts: 0,
+                    p: 0,
+                    w: 0,
+                    d: 0,
+                    l: 0,
+                    gf: 0,
+                    ga: 0,
+                    gd: 0
+                }));
+            }
+
+            switchTab(tab) {
+                this.currentTab = tab;
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    btn.classList.remove('text-emerald-400');
+                    btn.classList.add('hover:text-emerald-400');
+                });
+                const activeNav = document.getElementById(`nav-${tab}`);
+                if (activeNav) {
+                    activeNav.classList.add('text-emerald-400');
+                }
+                this.render();
+            }
+
+            renderHeader() {
+                const userTeam = this.getUserTeam();
+                document.getElementById('user-club-badge').innerText = userTeam.short;
+                document.getElementById('user-club-name').innerText = userTeam.name;
+                document.getElementById('header-popularity').innerText = userTeam.rep;
+                document.getElementById('header-budget').innerText = `R$ ${(userTeam.budget / 1000000).toFixed(1)}M`;
+                document.getElementById('header-date').innerText = `Rodada ${this.currentRound} de ${this.maxRounds}`;
+                document.getElementById('header-season').innerText = `Brasileirão ${this.currentYear}`;
+            }
+
+            render() {
+                this.renderHeader();
+                const container = document.getElementById('main-container');
+                container.innerHTML = '';
+
+                switch (this.currentTab) {
+                    case 'dashboard':
+                        container.appendChild(this.renderDashboard());
+                        break;
+                    case 'squad':
+                        container.appendChild(this.renderSquad());
+                        break;
+                    case 'match':
+                        container.appendChild(this.renderMatchView());
+                        break;
+                    case 'competitions':
+                        container.appendChild(this.renderCompetitions());
+                        break;
+                    case 'transfers':
+                        container.appendChild(this.renderTransfers());
+                        break;
+                    case 'trophies':
+                        container.appendChild(this.renderTrophies());
+                        break;
+                }
+            }
+
+            renderDashboard() {
+                const div = document.createElement('div');
+                div.className = 'grid grid-cols-1 md:grid-cols-3 gap-4';
+
+                const userTeam = this.getUserTeam();
+                const userOvr = this.getTeamOvr(userTeam);
+                const nextMatch = this.getNextMatch(userTeam.id);
+
+                div.innerHTML = `
+                    <!-- Quick Stats -->
+                    <div class="glass-panel p-4 rounded-xl flex flex-col justify-between">
+                        <div>
+                            <div class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Resumo do Clube</div>
+                            <h2 class="text-2xl font-bold text-white mt-1">${userTeam.name}</h2>
+                            <p class="text-xs text-slate-400">Estádio: ${userTeam.stadium}</p>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 mt-4 text-center">
+                            <div class="bg-slate-800/60 p-2 rounded-lg border border-slate-700/50">
+                                <span class="text-[10px] text-slate-400 block">FORÇA OVR</span>
+                                <span class="text-xl font-bold text-emerald-400 stat-badge">${userOvr}</span>
+                            </div>
+                            <div class="bg-slate-800/60 p-2 rounded-lg border border-slate-700/50">
+                                <span class="text-[10px] text-slate-400 block">JOGADORES</span>
+                                <span class="text-xl font-bold text-slate-200 stat-badge">${userTeam.players.length}</span>
+                            </div>
+                            <div class="bg-slate-800/60 p-2 rounded-lg border border-slate-700/50">
+                                <span class="text-[10px] text-slate-400 block">REPUTAÇÃO</span>
+                                <span class="text-xl font-bold text-amber-400 stat-badge">${userTeam.rep}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Next Match Card -->
+                    <div class="glass-panel p-4 rounded-xl flex flex-col justify-between">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                            <span class="text-xs text-slate-400 uppercase font-semibold">Próximo Confronto</span>
+                            <span class="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full font-medium">Rodada ${this.currentRound}</span>
+                        </div>
+                        ${nextMatch ? `
+                            <div class="flex items-center justify-around py-3">
+                                <div class="text-center">
+                                    <div class="w-12 h-12 mx-auto rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center font-bold text-sm text-slate-200 mb-1">
+                                        ${this.getTeamById(nextMatch.home).short}
+                                    </div>
+                                    <span class="text-xs font-semibold block">${this.getTeamById(nextMatch.home).name}</span>
+                                </div>
+                                <div class="text-lg font-bold text-slate-500">VS</div>
+                                <div class="text-center">
+                                    <div class="w-12 h-12 mx-auto rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center font-bold text-sm text-slate-200 mb-1">
+                                        ${this.getTeamById(nextMatch.away).short}
+                                    </div>
+                                    <span class="text-xs font-semibold block">${this.getTeamById(nextMatch.away).name}</span>
+                                </div>
+                            </div>
+                            <button onclick="app.switchTab('match')" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs transition shadow-lg shadow-emerald-900/30">
+                                IR PARA A PARTIDA
+                            </button>
+                        ` : `
+                            <div class="py-6 text-center text-slate-400 text-xs">Temporada Finalizada!</div>
+                        `}
+                    </div>
+
+                    <!-- Quick Leaderboard snippet -->
+                    <div class="glass-panel p-4 rounded-xl">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-xs text-slate-400 uppercase font-semibold">Top 5 Tabela</span>
+                            <button onclick="app.switchTab('competitions')" class="text-xs text-emerald-400 hover:underline">Ver Completa</button>
+                        </div>
+                        <div class="space-y-1.5 text-xs">
+                            ${this.getSortedStandings().slice(0, 5).map((s, idx) => `
+                                <div class="flex items-center justify-between p-1.5 rounded ${s.id === userTeam.id ? 'bg-emerald-900/30 border border-emerald-500/30 text-emerald-300' : 'hover:bg-slate-800/40'}">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-4 font-bold ${idx < 4 ? 'text-emerald-400' : 'text-slate-500'}">${idx + 1}</span>
+                                        <span class="font-semibold">${s.name}</span>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-slate-400 text-[10px]">${s.p}J</span>
+                                        <span class="font-bold text-white stat-badge">${s.pts} PTS</span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                return div;
+            }
+
+            renderSquad() {
+                const userTeam = this.getUserTeam();
+                const div = document.createElement('div');
+                div.className = 'glass-panel p-4 rounded-xl flex flex-col gap-4';
+
+                const starters = userTeam.players.filter(p => p.starter);
+                const bench = userTeam.players.filter(p => !p.starter);
+
+                div.innerHTML = `
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <div>
+                            <h2 class="font-bold text-lg text-white">Gerenciamento de Elenco</h2>
+                            <p class="text-xs text-slate-400">Escale os 11 titulares e reservas do ${userTeam.name}</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs text-slate-400 block">Média Titulares</span>
+                            <span class="text-xl font-bold text-emerald-400 stat-badge">${this.getTeamOvr(userTeam)} OVR</span>
+                        </div>
+                    </div>
+
+                    <!-- Squad Tables -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <!-- Starters -->
+                        <div>
+                            <h3 class="text-xs uppercase font-bold text-emerald-400 mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-star"></i> Titulares (${starters.length}/11)
+                            </h3>
+                            <div class="space-y-1 bg-slate-900/50 p-2 rounded-xl border border-slate-800">
+                                ${starters.map(p => this.renderPlayerRow(p, true)).join('')}
+                            </div>
+                        </div>
+
+                        <!-- Bench -->
+                        <div>
+                            <h3 class="text-xs uppercase font-bold text-slate-400 mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-bench-tree"></i> Reservas (${bench.length})
+                            </h3>
+                            <div class="space-y-1 bg-slate-900/50 p-2 rounded-xl border border-slate-800 max-h-[420px] overflow-y-auto">
+                                ${bench.map(p => this.renderPlayerRow(p, false)).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                return div;
+            }
+
+            renderPlayerRow(p, isStarter) {
+                return `
+                    <div class="flex items-center justify-between p-2 rounded-lg bg-slate-800/40 hover:bg-slate-800 border border-slate-700/40 transition">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-700 text-slate-300 w-9 text-center">${p.pos}</span>
+                            <span class="font-semibold text-xs text-white">${p.name}</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="text-right">
+                                <span class="text-xs font-bold text-amber-400 stat-badge block">${p.ovr} OVR</span>
+                                <span class="text-[9px] text-slate-400">R$ ${(p.val / 1000000).toFixed(1)}M</span>
+                            </div>
+                            <button onclick="app.toggleStarter('${p.id}')" class="px-2 py-1 text-[10px] rounded font-bold transition ${isStarter ? 'bg-amber-600/20 text-amber-400 hover:bg-amber-600/40 border border-amber-500/30' : 'bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/40 border border-emerald-500/30'}">
+                                ${isStarter ? 'Mover Reserva' : 'Escalar Titular'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            toggleStarter(playerId) {
+                const userTeam = this.getUserTeam();
+                const player = userTeam.players.find(p => p.id === playerId);
+                if (!player) return;
+
+                if (!player.starter) {
+                    const startersCount = userTeam.players.filter(p => p.starter).length;
+                    if (startersCount >= 11) {
+                        this.showToast('Você já tem 11 titulares selecionados!', 'warning');
+                        return;
+                    }
+                }
+
+                player.starter = !player.starter;
+                this.render();
+            }
+
+            renderMatchView() {
+                const div = document.createElement('div');
+                div.className = 'glass-panel p-4 rounded-xl flex flex-col gap-4';
+
+                const roundMatches = this.fixtures[this.currentRound - 1];
+                const userMatch = roundMatches ? roundMatches.find(m => m.home === this.userTeamId || m.away === this.userTeamId) : null;
+
+                div.innerHTML = `
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <div>
+                            <h2 class="font-bold text-lg text-white">Centro de Partida</h2>
+                            <p class="text-xs text-slate-400">Rodada ${this.currentRound} de ${this.maxRounds}</p>
+                        </div>
+                        <button onclick="app.simulateRound()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs transition shadow-lg shadow-emerald-900/30 flex items-center gap-2">
+                            <i class="fa-solid fa-play"></i> Simular Rodada
+                        </button>
+                    </div>
+
+                    <!-- Matches in this round -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        ${roundMatches ? roundMatches.map(m => {
+                            const home = this.getTeamById(m.home);
+                            const away = this.getTeamById(m.away);
+                            const isUser = m.home === this.userTeamId || m.away === this.userTeamId;
+                            return `
+                                <div class="p-3 rounded-xl border ${isUser ? 'border-emerald-500/50 bg-emerald-950/20' : 'border-slate-800 bg-slate-900/40'} flex items-center justify-between">
+                                    <div class="flex items-center gap-2 w-2/5">
+                                        <span class="w-6 h-6 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px] font-bold text-slate-300">${home.short}</span>
+                                        <span class="font-semibold text-xs truncate ${m.home === this.userTeamId ? 'text-emerald-400' : 'text-slate-200'}">${home.name}</span>
+                                    </div>
+
+                                    <div class="text-center w-1/5 bg-slate-800/80 px-2 py-1 rounded border border-slate-700">
+                                        <span class="font-bold text-xs ${m.played ? 'text-amber-400' : 'text-slate-500'}">
+                                            ${m.played ? `${m.homeGoals} - ${m.awayGoals}` : 'VS'}
+                                        </span>
+                                    </div>
+
+                                    <div class="flex items-center gap-2 w-2/5 justify-end text-right">
+                                        <span class="font-semibold text-xs truncate ${m.away === this.userTeamId ? 'text-emerald-400' : 'text-slate-200'}">${away.name}</span>
+                                        <span class="w-6 h-6 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px] font-bold text-slate-300">${away.short}</span>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('') : '<div class="col-span-2 text-center text-slate-400 py-8">Fim da Temporada!</div>'}
+                    </div>
+                `;
+                return div;
+            }
+
+            simulateRound() {
+                if (this.currentRound > this.maxRounds) {
+                    this.showToast('A temporada já foi finalizada!', 'info');
+                    return;
+                }
+
+                const roundMatches = this.fixtures[this.currentRound - 1];
+                if (!roundMatches) return;
+
+                roundMatches.forEach(m => {
+                    const homeTeam = this.getTeamById(m.home);
+                    const awayTeam = this.getTeamById(m.away);
+
+                    const homeOvr = this.getTeamOvr(homeTeam) + 3; // Home advantage
+                    const awayOvr = this.getTeamOvr(awayTeam);
+
+                    // Poisson-like score simulation based on OVR difference
+                    const diff = homeOvr - awayOvr;
+                    let homeBase = Math.max(0, 1 + Math.floor(diff / 10) + Math.floor(Math.random() * 3));
+                    let awayBase = Math.max(0, 1 - Math.floor(diff / 10) + Math.floor(Math.random() * 3));
+
+                    m.homeGoals = Math.min(6, homeBase);
+                    m.awayGoals = Math.min(6, awayBase);
+                    m.played = true;
+
+                    // Update standings
+                    const homeStanding = this.standings.find(s => s.id === m.home);
+                    const awayStanding = this.standings.find(s => s.id === m.away);
+
+                    homeStanding.p++;
+                    awayStanding.p++;
+                    homeStanding.gf += m.homeGoals;
+                    homeStanding.ga += m.awayGoals;
+                    awayStanding.gf += m.awayGoals;
+                    awayStanding.ga += m.homeGoals;
+                    homeStanding.gd = homeStanding.gf - homeStanding.ga;
+                    awayStanding.gd = awayStanding.gf - awayStanding.ga;
+
+                    if (m.homeGoals > m.awayGoals) {
+                        homeStanding.pts += 3;
+                        homeStanding.w++;
+                        awayStanding.l++;
+                    } else if (m.homeGoals < m.awayGoals) {
+                        awayStanding.pts += 3;
+                        awayStanding.w++;
+                        homeStanding.l++;
+                    } else {
+                        homeStanding.pts += 1;
+                        awayStanding.pts += 1;
+                        homeStanding.d++;
+                        awayStanding.d++;
+                    }
+                });
+
+                // Matchday revenue for home team
+                const userMatch = roundMatches.find(m => m.home === this.userTeamId);
+                if (userMatch) {
+                    const userTeam = this.getUserTeam();
+                    const ticketRevenue = 1500000 + Math.floor(Math.random() * 1000000);
+                    userTeam.budget += ticketRevenue;
+                    this.showToast(`Receita da Partida (Ingressos): +R$ ${(ticketRevenue / 1000000).toFixed(2)}M`, 'success');
+                }
+
+                this.currentRound++;
+                if (this.currentRound > this.maxRounds) {
+                    this.finishSeason();
+                }
+
+                this.render();
+            }
+
+            finishSeason() {
+                const champion = this.getSortedStandings()[0];
+                const userTeam = this.getUserTeam();
+
+                if (champion.id === userTeam.id) {
+                    userTeam.realTrophies.br += 1;
+                    userTeam.budget += 50000000;
+                    this.trophies.push({ year: this.currentYear, title: 'Campeão Brasileirão' });
+                    this.showToast('PARABÉNS! Você é o CAMPEÃO do Brasileirão! Prêmio: R$ 50M', 'success');
+                } else {
+                    this.showToast(`O ${champion.name} venceu o Brasileirão ${this.currentYear}.`, 'info');
+                }
+            }
+
+            getSortedStandings() {
+                return [...this.standings].sort((a, b) => {
+                    if (b.pts !== a.pts) return b.pts - a.pts;
+                    if (b.w !== a.w) return b.w - a.w;
+                    if (b.gd !== a.gd) return b.gd - a.gd;
+                    return b.gf - a.gf;
+                });
+            }
+
+            renderCompetitions() {
+                const div = document.createElement('div');
+                div.className = 'glass-panel p-4 rounded-xl flex flex-col gap-4';
+
+                const sorted = this.getSortedStandings();
+
+                div.innerHTML = `
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <div>
+                            <h2 class="font-bold text-lg text-white">Tabela do Brasileirão</h2>
+                            <p class="text-xs text-slate-400">Classificação Geral - Série A</p>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs text-slate-300">
+                            <thead class="bg-slate-900/80 text-slate-400 uppercase text-[10px] border-b border-slate-800">
+                                <tr>
+                                    <th class="p-2">Pos</th>
+                                    <th class="p-2">Clube</th>
+                                    <th class="p-2 text-center">PTS</th>
+                                    <th class="p-2 text-center">J</th>
+                                    <th class="p-2 text-center">V</th>
+                                    <th class="p-2 text-center">E</th>
+                                    <th class="p-2 text-center">D</th>
+                                    <th class="p-2 text-center">GP</th>
+                                    <th class="p-2 text-center">GC</th>
+                                    <th class="p-2 text-center">SG</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800/60">
+                                ${sorted.map((s, idx) => {
+                                    let borderClass = '';
+                                    if (idx < 4) borderClass = 'border-l-4 border-l-blue-500'; // Libertadores
+                                    else if (idx >= 16) borderClass = 'border-l-4 border-l-red-500'; // Z4
+
+                                    return `
+                                        <tr class="${s.id === this.userTeamId ? 'bg-emerald-950/30 text-emerald-300 font-bold' : 'hover:bg-slate-800/40'} ${borderClass}">
+                                            <td class="p-2 text-center font-bold">${idx + 1}</td>
+                                            <td class="p-2 font-semibold text-slate-200">${s.name}</td>
+                                            <td class="p-2 text-center font-bold text-amber-400 stat-badge">${s.pts}</td>
+                                            <td class="p-2 text-center">${s.p}</td>
+                                            <td class="p-2 text-center">${s.w}</td>
+                                            <td class="p-2 text-center">${s.d}</td>
+                                            <td class="p-2 text-center">${s.l}</td>
+                                            <td class="p-2 text-center">${s.gf}</td>
+                                            <td class="p-2 text-center">${s.ga}</td>
+                                            <td class="p-2 text-center">${s.gd}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                return div;
+            }
+
+            renderTransfers() {
+                const div = document.createElement('div');
+                div.className = 'glass-panel p-4 rounded-xl flex flex-col gap-4';
+
+                // Collect available market players from other teams
+                const availablePlayers = [];
+                this.teams.forEach(t => {
+                    if (t.id !== this.userTeamId) {
+                        t.players.forEach(p => {
+                            availablePlayers.push({ ...p, teamName: t.name, teamId: t.id });
+                        });
+                    }
+                });
+
+                div.innerHTML = `
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <div>
+                            <h2 class="font-bold text-lg text-white">Mercado de Transferências</h2>
+                            <p class="text-xs text-slate-400">Contrate reforços para qualificar seu elenco</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs text-slate-400 block">Orçamento Disponível</span>
+                            <span class="text-lg font-bold text-emerald-400 stat-badge">R$ ${(this.getUserTeam().budget / 1000000).toFixed(1)}M</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 max-h-[500px] overflow-y-auto">
+                        ${availablePlayers.slice(0, 20).map(p => `
+                            <div class="flex items-center justify-between p-3 rounded-lg bg-slate-800/40 border border-slate-700/40 hover:bg-slate-800 transition">
+                                <div>
+                                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-700 text-slate-300">${p.pos}</span>
+                                    <span class="font-semibold text-xs text-white ml-2">${p.name}</span>
+                                    <span class="text-[10px] text-slate-400 block mt-0.5">${p.teamName}</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <div class="text-right">
+                                        <span class="text-xs font-bold text-amber-400 stat-badge block">${p.ovr} OVR</span>
+                                        <span class="text-[10px] text-emerald-400 font-semibold">R$ ${(p.val / 1000000).toFixed(1)}M</span>
+                                    </div>
+                                    <button onclick="app.buyPlayer('${p.teamId}', '${p.id}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded text-xs transition shadow border border-emerald-500/30">
+                                        Comprar
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                return div;
+            }
+
+            buyPlayer(sellerTeamId, playerId) {
+                const userTeam = this.getUserTeam();
+                const sellerTeam = this.getTeamById(sellerTeamId);
+                const playerIndex = sellerTeam.players.findIndex(p => p.id === playerId);
+                const player = sellerTeam.players[playerIndex];
+
+                if (userTeam.budget < player.val) {
+                    this.showToast('Orçamento insuficiente para esta transferência!', 'danger');
+                    return;
+                }
+
+                userTeam.budget -= player.val;
+                sellerTeam.budget += player.val;
+
+                // Move player
+                sellerTeam.players.splice(playerIndex, 1);
+                player.starter = false;
+                userTeam.players.push(player);
+
+                this.showToast(`${player.name} foi contratado com sucesso pelo ${userTeam.name}!`, 'success');
+                this.render();
+            }
+
+            renderTrophies() {
+                const div = document.createElement('div');
+                div.className = 'glass-panel p-4 rounded-xl flex flex-col gap-4';
+                const userTeam = this.getUserTeam();
+
+                div.innerHTML = `
+                    <div class="border-b border-slate-800 pb-3">
+                        <h2 class="font-bold text-lg text-white">Galeria de Troféus</h2>
+                        <p class="text-xs text-slate-400">Conquistas do ${userTeam.name}</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 text-center flex flex-col items-center">
+                            <i class="fa-solid fa-trophy text-amber-400 text-4xl mb-2"></i>
+                            <span class="font-bold text-sm text-white">Brasileirão</span>
+                            <span class="text-2xl font-bold text-amber-400 stat-badge mt-1">${userTeam.realTrophies.br}</span>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 text-center flex flex-col items-center">
+                            <i class="fa-solid fa-earth-americas text-sky-400 text-4xl mb-2"></i>
+                            <span class="font-bold text-sm text-white">Libertadores</span>
+                            <span class="text-2xl font-bold text-sky-400 stat-badge mt-1">${userTeam.realTrophies.lib}</span>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 text-center flex flex-col items-center">
+                            <i class="fa-solid fa-award text-emerald-400 text-4xl mb-2"></i>
+                            <span class="font-bold text-sm text-white">Copa do Brasil</span>
+                            <span class="text-2xl font-bold text-emerald-400 stat-badge mt-1">${userTeam.realTrophies.copa}</span>
+                        </div>
+                    </div>
+                `;
+                return div;
+            }
+
+            getTeamById(id) {
+                return this.teams.find(t => t.id === id);
+            }
+
+            getNextMatch(teamId) {
+                const roundMatches = this.fixtures[this.currentRound - 1];
+                if (!roundMatches) return null;
+                return roundMatches.find(m => m.home === teamId || m.away === teamId);
+            }
+
+            openModal(type) {
+                const overlay = document.getElementById('modal-overlay');
+                const content = document.getElementById('modal-content');
+                overlay.classList.remove('hidden');
+
+                if (type === 'settings') {
+                    content.innerHTML = `
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
+                            <h3 class="font-bold text-lg text-white">Trocar de Clube</h3>
+                            <button onclick="app.closeModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            ${this.teams.map(t => `
+                                <button onclick="app.selectUserClub('${t.id}')" class="p-2 rounded bg-slate-800/60 border border-slate-700/60 hover:bg-slate-700 text-left flex items-center gap-2">
+                                    <span class="w-6 h-6 rounded-full bg-slate-900 flex items-center justify-center text-[10px] font-bold text-emerald-400">${t.short}</span>
+                                    <span class="text-xs font-semibold text-white truncate">${t.name}</span>
+                                </button>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+            }
+
+            selectUserClub(teamId) {
+                this.userTeamId = teamId;
+                this.closeModal();
+                this.render();
+                this.showToast(`Você agora comanda o ${this.getUserTeam().name}!`, 'info');
+            }
+
+            closeModal() {
+                document.getElementById('modal-overlay').classList.add('hidden');
+            }
+
+            showToast(msg, type = 'info') {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                let bg = 'bg-slate-800 border-slate-700 text-slate-200';
+                if (type === 'success') bg = 'bg-emerald-900/90 border-emerald-500 text-emerald-200';
+                if (type === 'danger') bg = 'bg-red-900/90 border-red-500 text-red-200';
+                if (type === 'warning') bg = 'bg-amber-900/90 border-amber-500 text-amber-200';
+
+                toast.className = `p-3 rounded-lg border shadow-xl text-xs font-medium backdrop-blur-md transition-all duration-300 pointer-events-auto ${bg}`;
+                toast.innerText = msg;
+
+                container.appendChild(toast);
+                setTimeout(() => toast.remove(), 3500);
+            }
+        }
+
+        // Initialize application instance
+        let app;
+        window.onload = () => {
+            app = new UltraManager();
+        };
+    </script>
+</body>
+</html>
+```
